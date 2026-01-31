@@ -14,15 +14,13 @@ import kotlinx.coroutines.launch
 
 class KategoriViewModel(private val repositoriBuku: RepositoriBuku) : ViewModel() {
 
-    // Helper untuk form input kategori
     var namaKategori by mutableStateOf("")
     var deskripsiKategori by mutableStateOf("")
     var parentIdKategori by mutableStateOf<Int?>(null)
-    
-    // Status validasi / error
+
     var errorMessage by mutableStateOf<String?>(null)
 
-    // Data List Kategori untuk dropdown / list
+
     val listKategori: StateFlow<List<Kategori>> = repositoriBuku.getAllKategori()
         .stateIn(
             scope = viewModelScope,
@@ -45,7 +43,7 @@ class KategoriViewModel(private val repositoriBuku: RepositoriBuku) : ViewModel(
                         parentId = parentIdKategori
                     )
                 )
-                // Reset form
+
                 namaKategori = ""
                 deskripsiKategori = ""
                 parentIdKategori = null
@@ -56,14 +54,14 @@ class KategoriViewModel(private val repositoriBuku: RepositoriBuku) : ViewModel(
         }
     }
     
-    // Fungsi delete kompleks
+
     fun deleteKategori(id: Int, deleteBooks: Boolean) {
         viewModelScope.launch {
             try {
                 repositoriBuku.deleteKategori(id, deleteBooks)
                 errorMessage = null
             } catch (e: Exception) {
-                // Tangkap error jika ada buku dipinjam (Rollback otomatis di Repo)
+
                 errorMessage = e.message
             }
         }

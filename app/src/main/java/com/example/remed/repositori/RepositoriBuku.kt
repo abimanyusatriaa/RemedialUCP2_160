@@ -11,8 +11,7 @@ interface RepositoriBuku {
     
     suspend fun insertBuku(buku: Buku, penulisIds: List<Int>)
     suspend fun insertKategori(kategori: Kategori)
-    
-    // Logika hapus kategori yang kompleks
+
     suspend fun deleteKategori(kategoriId: Int, deleteBooks: Boolean)
 }
 
@@ -39,7 +38,7 @@ class RepositoriBukuImpl(private val bukuDao: BukuDao, private val db: BukuDatab
     }
 
     override suspend fun insertKategori(kategori: Kategori) {
-        // Validasi Cyclic Reference jika parentId tidak null
+
         if (kategori.parentId != null) {
             validateCycle(kategori.id, kategori.parentId)
         }
@@ -57,28 +56,28 @@ class RepositoriBukuImpl(private val bukuDao: BukuDao, private val db: BukuDatab
         }
     }
 
-    // Tantangan Krusial: Logika Penghapusan
+
     override suspend fun deleteKategori(kategoriId: Int, deleteBooks: Boolean) {
         db.withTransaction {
-            // 1. Cek apakah ada buku yang dipinjam di kategori ini
+
             val borrowedBooks = bukuDao.getBorrowedBooksInCategory(kategoriId)
             
             if (borrowedBooks.isNotEmpty()) {
-                // Rollback otomatis terjadi jika exception dilempar dalam block withTransaction
+
                 throw IllegalStateException("GAGAL: Terdapat ${borrowedBooks.size} buku yang sedang dipinjam dalam kategori ini. Operasi dibatalkan.")
             }
 
-            // 2. Opsi Dinamis: Hapus buku atau Set Tanpa Kategori
+
             if (deleteBooks) {
                 bukuDao.softDeleteBukuByCategory(kategoriId)
                 bukuDao.insertAudit(AuditLog(tableName = "buku", recordId = kategoriId, action = "SOFT_DELETE_BY_CATEGORY"))
             } else {
-                // Update buku jadi "Tanpa Kategori" (null)
+
                 bukuDao.moveBukuToCategory(kategoriId, null)
                 bukuDao.insertAudit(AuditLog(tableName = "buku", recordId = kategoriId, action = "UNLINK_CATEGORY"))
             }
 
-            // 3. Hapus Kategori (Soft Delete)
+
             bukuDao.softDeleteKategori(kategoriId)
             bukuDao.insertAudit(AuditLog(tableName = "kategori", recordId = kategoriId, action = "SOFT_DELETE"))
         }

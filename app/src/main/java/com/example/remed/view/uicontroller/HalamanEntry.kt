@@ -39,11 +39,11 @@ fun HalamanEntry(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            // Kita bisa reuse komponen TopAppBar Custom jika ada, atau pakai default
+
             androidx.compose.material3.TopAppBar(
                 title = { Text("Tambah Buku Baru") },
                 navigationIcon = {
-                     // Tambahkan tombol back jika perlu
+
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -121,13 +121,6 @@ fun FormInput(
             enabled = enabled,
             singleLine = false
         )
-        
-        // Pilihan Status (Radio Button / Dropdown) - Simplifikasi: Text dulu atau Dropdown Status
-        // Disini kita tambahkan pilihan Kategori
-        
-        // Note: Idealnya kita pass listKategori dari ViewModel
-        // Namun untuk sementara kita biarkan manual ID atau update ViewModel nanti 
-        // agar mengambil list kategori.
         
         OutlinedTextField(
              value = detailBuku.kategoriId?.toString() ?: "",

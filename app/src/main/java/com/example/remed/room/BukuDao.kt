@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BukuDao {
-    // --- BUKU ---
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertBuku(buku: Buku): Long
 
@@ -21,18 +21,18 @@ interface BukuDao {
     @Query("UPDATE buku SET isDeleted = 1 WHERE id = :id")
     suspend fun softDeleteBuku(id: Int)
     
-    // Update kategori buku secara batch (misal saat kategori dihapus)
+
     @Query("UPDATE buku SET kategoriId = :newKategoriId WHERE kategoriId = :oldKategoriId")
     suspend fun moveBukuToCategory(oldKategoriId: Int, newKategoriId: Int?)
 
     @Query("UPDATE buku SET isDeleted = 1 WHERE kategoriId = :kategoriId")
     suspend fun softDeleteBukuByCategory(kategoriId: Int)
 
-    // Cek status buku di kategori tertentu
+
     @Query("SELECT * FROM buku WHERE kategoriId = :kategoriId AND status = 'DIPINJAM' AND isDeleted = 0")
     suspend fun getBorrowedBooksInCategory(kategoriId: Int): List<Buku>
 
-    // --- KATEGORI ---
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertKategori(kategori: Kategori)
 
@@ -48,8 +48,6 @@ interface BukuDao {
     @Query("UPDATE kategori SET isDeleted = 1 WHERE id = :id")
     suspend fun softDeleteKategori(id: Int)
 
-    // RECURSIVE QUERY: Ambil semua ID sub-kategori
-    // Membutuhkan Room versi terbaru yang support CTE (SQLite 3.8.3+)
     @Query("""
         WITH RECURSIVE CategoryHierarchy AS (
             SELECT id FROM kategori WHERE id = :parentId AND isDeleted = 0
@@ -62,14 +60,14 @@ interface BukuDao {
     """)
     fun getBukuByCategoryRecursive(parentId: Int): Flow<List<Buku>>
 
-    // --- PENULIS & RELASI ---
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPenulis(penulis: Penulis)
     
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCrossRef(crossRef: BukuPenulisCrossRef)
 
-    // --- AUDIT LOG ---
+
     @Insert
     suspend fun insertAudit(log: AuditLog)
 }

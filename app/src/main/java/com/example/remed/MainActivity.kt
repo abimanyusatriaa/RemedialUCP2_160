@@ -21,9 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RemedTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                   // Panggil PetaNavigasi
-                   // Modifier.padding(innerPadding) bisa diteruskan jika perlu, 
-                   // tapi biasanya NavHost menangani padding sendiri atau di dalam screen
+
                    PetaNavigasi() 
                 }
             }

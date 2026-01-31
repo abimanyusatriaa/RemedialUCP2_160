@@ -5,7 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-// Tabel Kategori dengan Hierarki
 @Entity(
     tableName = "kategori",
     foreignKeys = [
@@ -13,7 +12,7 @@ import androidx.room.PrimaryKey
             entity = Kategori::class,
             parentColumns = ["id"],
             childColumns = ["parentId"],
-            onDelete = ForeignKey.RESTRICT // Cegah hapus jika masih ada child, handle manual di repo
+            onDelete = ForeignKey.RESTRICT
         )
     ],
     indices = [Index(value = ["parentId"])]
@@ -23,11 +22,11 @@ data class Kategori(
     val id: Int = 0,
     val nama: String,
     val deskripsi: String,
-    val parentId: Int? = null, // null berarti root category
+    val parentId: Int? = null,
     val isDeleted: Boolean = false
 )
 
-// Tabel Penulis
+
 @Entity(tableName = "penulis")
 data class Penulis(
     @PrimaryKey(autoGenerate = true)
@@ -37,7 +36,7 @@ data class Penulis(
     val isDeleted: Boolean = false
 )
 
-// Tabel Buku
+
 @Entity(
     tableName = "buku",
     foreignKeys = [
@@ -64,7 +63,7 @@ enum class StatusBuku {
     TERSEDIA, DIPINJAM, HILANG
 }
 
-// Relasi Many-to-Many Buku & Penulis
+
 @Entity(
     tableName = "buku_penulis_cross_ref",
     primaryKeys = ["bukuId", "penulisId"],
@@ -75,14 +74,14 @@ data class BukuPenulisCrossRef(
     val penulisId: Int
 )
 
-// Audit Log untuk Integritas Data
+
 @Entity(tableName = "audit_log")
 data class AuditLog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val tableName: String,
     val recordId: Int,
-    val action: String, // INSERT, UPDATE, DELETE, SOFT_DELETE
+    val action: String,
     val timestamp: Long = System.currentTimeMillis(),
     val oldDataJson: String? = null,
     val newDataJson: String? = null
